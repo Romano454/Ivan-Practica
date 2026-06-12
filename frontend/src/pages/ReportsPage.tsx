@@ -41,8 +41,14 @@ export default function ReportsPage() {
         doctorId: doctorId ? Number(doctorId) : undefined,
       });
       const url = URL.createObjectURL(blob);
-      // Abre el PDF en una pestaña nueva; el usuario puede guardarlo desde ahí
-      window.open(url, '_blank', 'noopener');
+      // Descarga directa del PDF: más fiable que window.open (evita bloqueos de
+      // popups y funciona en la PWA del celular)
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reporte-citas-${from || 'inicio'}_${to || 'hoy'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (e) {
       setError(apiErrorMessage(e, 'No se pudo generar el reporte'));
