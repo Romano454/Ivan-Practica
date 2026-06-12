@@ -12,6 +12,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EventIcon from '@mui/icons-material/Event';
 import HistoryIcon from '@mui/icons-material/History';
@@ -36,6 +37,7 @@ const MENU: MenuItem[] = [
   { label: 'Pacientes', path: '/pacientes', icon: <PeopleIcon /> },
   { label: 'Doctores', path: '/doctores', icon: <MedicalServicesIcon /> },
   { label: 'Citas', path: '/citas', icon: <EventIcon /> },
+  { label: 'Reportes', path: '/reportes', icon: <AssessmentIcon /> },
   { label: 'Usuarios', path: '/usuarios', icon: <ManageAccountsIcon />, adminOnly: true },
   { label: 'Logs de acceso', path: '/logs', icon: <HistoryIcon />, adminOnly: true },
 ];

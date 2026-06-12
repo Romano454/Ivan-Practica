@@ -8,6 +8,7 @@ import DoctorsPage from './pages/DoctorsPage';
 import LoginPage from './pages/LoginPage';
 import PatientsPage from './pages/PatientsPage';
 import RegisterPage from './pages/RegisterPage';
+import ReportsPage from './pages/ReportsPage';
 import UsersPage from './pages/UsersPage';
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/pacientes" element={<PatientsPage />} />
           <Route path="/doctores" element={<DoctorsPage />} />
           <Route path="/citas" element={<AppointmentsPage />} />
+          <Route path="/reportes" element={<ReportsPage />} />
           <Route path="/usuarios" element={<UsersPage />} />
           <Route path="/logs" element={<AccessLogsPage />} />
         </Route>
