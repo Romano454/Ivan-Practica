@@ -287,7 +287,7 @@ export default function AppointmentsPage() {
                 helperText={errors.patientId?.message}
               >
                 {patients.map((p) => (
-                  <MenuItem key={p.id} value={p.id}>
+                  <MenuItem key={p.id} value={String(p.id)}>
                     {p.lastName}, {p.firstName} — {p.document}
                   </MenuItem>
                 ))}
@@ -301,7 +301,7 @@ export default function AppointmentsPage() {
                 helperText={errors.doctorId?.message}
               >
                 {doctors.map((d) => (
-                  <MenuItem key={d.id} value={d.id}>
+                  <MenuItem key={d.id} value={String(d.id)}>
                     {d.name} ({d.specialty})
                   </MenuItem>
                 ))}
