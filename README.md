@@ -16,3 +16,5 @@ Proyecto académico individual. Frontend en React, backend en NestJS, PostgreSQL
 3. Frontend: `cd frontend && npm install && npm run dev` (http://localhost:5173)
 
 Usuario inicial: ver variables `ADMIN_*` en `backend/.env.example`.
+
+> Nota: el usuario administrador se crea solo en el **primer arranque** (seed). Cambiar `ADMIN_PASSWORD` después no actualiza la contraseña de un admin ya creado.

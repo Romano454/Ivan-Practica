@@ -24,6 +24,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    await this.captcha.verify(dto.captchaToken);
     const exists = await this.users.findByEmail(dto.email);
     if (exists) {
       throw new ConflictException('El email ya está registrado');

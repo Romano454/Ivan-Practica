@@ -10,8 +10,8 @@ async function bootstrap() {
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  // Necesario para leer la IP real detrás de proxies (Render, Vercel)
-  app.getHttpAdapter().getInstance().set('trust proxy', true);
+  // 1 = confiar solo en el primer proxy (Render); req.ip resuelve la IP real del cliente
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
