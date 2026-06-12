@@ -16,17 +16,27 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get('DB_USER', 'medicitas'),
-        password: config.get('DB_PASSWORD', 'medicitas'),
-        database: config.get('DB_NAME', 'medicitas'),
-        autoLoadEntities: true,
-        // synchronize solo en desarrollo académico; en producción se usarían migraciones
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        // En producción (Render + Neon) se usa DATABASE_URL con SSL;
+        // en desarrollo, las variables DB_* individuales sin SSL
+        const url = config.get<string>('DATABASE_URL');
+        const connection = url
+          ? { url, ssl: { rejectUnauthorized: false } }
+          : {
+              host: config.get('DB_HOST', 'localhost'),
+              port: config.get<number>('DB_PORT', 5432),
+              username: config.get('DB_USER', 'medicitas'),
+              password: config.get('DB_PASSWORD', 'medicitas'),
+              database: config.get('DB_NAME', 'medicitas'),
+            };
+        return {
+          type: 'postgres' as const,
+          ...connection,
+          autoLoadEntities: true,
+          // synchronize solo en proyecto académico; en producción real se usarían migraciones
+          synchronize: true,
+        };
+      },
     }),
     UsersModule,
     AccessLogsModule,

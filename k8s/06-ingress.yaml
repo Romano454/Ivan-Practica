@@ -1,0 +1,23 @@
+# Requiere un ingress controller (nginx). En Docker Desktop / minikube:
+#   minikube addons enable ingress   (o instalar ingress-nginx)
+# y agregar al archivo hosts:  127.0.0.1 medicitas.local
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: medicitas
+  namespace: medicitas
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: medicitas.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

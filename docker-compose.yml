@@ -11,6 +11,42 @@ services:
       - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medicitas"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: medicitas-backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: medicitas
+      DB_PASSWORD: medicitas
+      DB_NAME: medicitas
+      JWT_SECRET: ${JWT_SECRET:-secreto-de-docker-compose-cambiar-en-produccion}
+      JWT_EXPIRES: 8h
+      # Clave de PRUEBA de reCAPTCHA (siempre valida); usar la real en produccion
+      RECAPTCHA_SECRET: ${RECAPTCHA_SECRET:-6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe}
+      ADMIN_NAME: Administrador
+      ADMIN_EMAIL: admin@medicitas.com
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin#2026!}
+      FRONTEND_URL: http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    container_name: medicitas-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
 
 volumes:
   db_data:

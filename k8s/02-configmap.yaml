@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medicitas-config
+  namespace: medicitas
+data:
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_USER: medicitas
+  DB_NAME: medicitas
+  JWT_EXPIRES: 8h
+  ADMIN_NAME: Administrador
+  ADMIN_EMAIL: admin@medicitas.com
+  FRONTEND_URL: http://medicitas.local

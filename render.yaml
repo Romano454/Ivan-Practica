@@ -1,0 +1,27 @@
+# Blueprint de Render para el backend (https://render.com)
+# Conectar el repo en Render y este archivo configura el servicio automáticamente.
+services:
+  - type: web
+    name: medicitas-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: node dist/main.js
+    envVars:
+      - key: DATABASE_URL # Cadena de conexión de Neon (postgresql://...)
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES
+        value: 8h
+      - key: RECAPTCHA_SECRET # Clave secreta real de reCAPTCHA
+        sync: false
+      - key: ADMIN_NAME
+        value: Administrador
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_URL # URL del frontend en Vercel (para CORS)
+        sync: false
