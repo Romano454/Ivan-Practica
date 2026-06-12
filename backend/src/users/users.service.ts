@@ -1,8 +1,18 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { evaluatePasswordStrength } from '../auth/password-strength';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserRole } from './user.entity';
 
 @Injectable()
@@ -34,6 +44,76 @@ export class UsersService implements OnApplicationBootstrap {
   }): Promise<User> {
     const user = this.repo.create(data);
     return this.repo.save(user);
+  }
+
+  // Incluye eliminados para que el ADMIN pueda restaurarlos
+  findAllWithDeleted(): Promise<User[]> {
+    return this.repo.find({ withDeleted: true, order: { name: 'ASC' } });
+  }
+
+  async adminCreate(dto: CreateUserDto): Promise<User> {
+    await this.ensureEmailFree(dto.email);
+    this.ensureStrongEnough(dto.password);
+    const user = await this.create({
+      name: dto.name,
+      email: dto.email,
+      passwordHash: await bcrypt.hash(dto.password, 10),
+      role: dto.role,
+    });
+    return this.sanitize(user);
+  }
+
+  async adminUpdate(id: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    if (dto.email && dto.email !== user.email) {
+      await this.ensureEmailFree(dto.email);
+      user.email = dto.email;
+    }
+    if (dto.name !== undefined) user.name = dto.name;
+    if (dto.role !== undefined) user.role = dto.role;
+    if (dto.isActive !== undefined) user.isActive = dto.isActive;
+    if (dto.password) {
+      this.ensureStrongEnough(dto.password);
+      user.passwordHash = await bcrypt.hash(dto.password, 10);
+    }
+    return this.sanitize(await this.repo.save(user));
+  }
+
+  async softDelete(id: number): Promise<{ message: string }> {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    await this.repo.softDelete(id);
+    return { message: 'Usuario eliminado' };
+  }
+
+  async restore(id: number): Promise<{ message: string }> {
+    const user = await this.repo.findOne({ where: { id }, withDeleted: true });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    await this.repo.restore(id);
+    return { message: 'Usuario restaurado' };
+  }
+
+  private async ensureEmailFree(email: string): Promise<void> {
+    const exists = await this.repo.findOne({
+      where: { email },
+      withDeleted: true,
+    });
+    if (exists) throw new ConflictException('El email ya está registrado');
+  }
+
+  private ensureStrongEnough(password: string): void {
+    if (evaluatePasswordStrength(password) === 'debil') {
+      throw new BadRequestException(
+        'La contraseña es débil: use una más larga combinando mayúsculas, números y símbolos',
+      );
+    }
+  }
+
+  // El hash puede venir presente cuando el repo lo guardó; no debe salir en la respuesta
+  private sanitize(user: User): User {
+    delete (user as Partial<User>).passwordHash;
+    return user;
   }
 
   // Crea el administrador inicial si no existe (primer arranque)
