@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: medicitas
       POSTGRES_DB: medicitas
     ports:
-      - "5432:5432"
+      # 5433 en el host para no chocar con un PostgreSQL nativo instalado en 5432
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
