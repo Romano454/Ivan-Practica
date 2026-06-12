@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link as RouterLink, Navigate, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -15,8 +15,8 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import axios from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { apiErrorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 
 const schema = z.object({
@@ -29,6 +29,8 @@ type FormData = z.infer<typeof schema>;
 export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const registered = Boolean(location.state?.registered);
   const captchaRef = useRef<ReCAPTCHA>(null);
   const [error, setError] = useState('');
   const {
@@ -51,11 +53,7 @@ export default function LoginPage() {
       navigate('/');
     } catch (e) {
       captchaRef.current?.reset();
-      setError(
-        axios.isAxiosError(e)
-          ? (e.response?.data?.message ?? 'Error al iniciar sesión')
-          : 'Error al iniciar sesión',
-      );
+      setError(apiErrorMessage(e, 'Error al iniciar sesión'));
     }
   };
 
@@ -79,6 +77,9 @@ export default function LoginPage() {
                 Inicie sesión para continuar
               </Typography>
             </Stack>
+            {registered && !error && (
+              <Alert severity="success">Cuenta creada, ya puede iniciar sesión</Alert>
+            )}
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
               label="Email"

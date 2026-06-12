@@ -11,8 +11,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(() => {
-    const raw = localStorage.getItem('mc_user');
-    return raw ? (JSON.parse(raw) as SessionUser) : null;
+    try {
+      const raw = localStorage.getItem('mc_user');
+      return raw ? (JSON.parse(raw) as SessionUser) : null;
+    } catch {
+      localStorage.removeItem('mc_user');
+      return null;
+    }
   });
 
   const login: AuthContextValue['login'] = async (data) => {

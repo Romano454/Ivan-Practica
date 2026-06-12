@@ -15,16 +15,22 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import axios from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { authApi } from '../api/auth';
+import { apiErrorMessage } from '../api/client';
 import PasswordStrengthMeter, { getStrength } from '../components/PasswordStrengthMeter';
 
 const schema = z
   .object({
-    name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+    name: z
+      .string()
+      .min(3, 'El nombre debe tener al menos 3 caracteres')
+      .max(80, 'El nombre no puede superar 80 caracteres'),
     email: z.string().email('El email no es válido'),
-    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
+    password: z
+      .string()
+      .min(8, 'La contraseña debe tener al menos 8 caracteres')
+      .max(72, 'La contraseña no puede superar 72 caracteres'),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
@@ -62,14 +68,10 @@ export default function RegisterPage() {
         password: data.password,
         captchaToken,
       });
-      navigate('/login');
+      navigate('/login', { state: { registered: true } });
     } catch (e) {
       captchaRef.current?.reset();
-      setError(
-        axios.isAxiosError(e)
-          ? (e.response?.data?.message ?? 'Error al registrar el usuario')
-          : 'Error al registrar el usuario',
-      );
+      setError(apiErrorMessage(e, 'Error al registrar el usuario'));
     }
   };
 
