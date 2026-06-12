@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: medicitas-db
+    environment:
+      POSTGRES_USER: medicitas
+      POSTGRES_PASSWORD: medicitas
+      POSTGRES_DB: medicitas
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
