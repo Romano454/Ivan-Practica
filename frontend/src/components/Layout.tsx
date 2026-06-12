@@ -22,6 +22,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import PeopleIcon from '@mui/icons-material/People';
 import { useAuth } from '../auth/AuthContext';
+import AssistantWidget from './AssistantWidget';
 
 const DRAWER_WIDTH = 230;
 
@@ -96,6 +97,7 @@ export default function Layout() {
         <Toolbar />
         <Outlet />
       </Box>
+      <AssistantWidget />
     </Box>
   );
 }

@@ -22,6 +22,11 @@ con CAPTCHA, permisos por rol y auditoría de accesos.
 - **Log de accesos**: usuario, IP, evento (INGRESO/SALIDA), navegador, fecha y hora.
 - **Reporte PDF** de citas por rango de fechas y doctor (pdfmake).
 - **Dashboard** con gráficos estadísticos (citas por mes, por estado y por doctor).
+- **PWA instalable**: la app se puede agregar a la pantalla de inicio del celular
+  (manifest + service worker con vite-plugin-pwa; el API nunca se cachea).
+- **Asistente inteligente** (burbuja flotante): responde preguntas sobre citas del día,
+  pendientes, doctores y pacientes usando la **API de Claude** (`ANTHROPIC_API_KEY`);
+  sin clave funciona en modo básico por reglas con los mismos datos.
 
 ## Estructura
 
@@ -97,6 +102,7 @@ Arquitectura: **Vercel** (frontend) + **Render** (backend) + **Neon** (PostgreSQ
 1. New → Web Service → conectar este repositorio (Render detecta `render.yaml`).
 2. Completar las variables: `DATABASE_URL` (Neon), `RECAPTCHA_SECRET`,
    `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `FRONTEND_URL` (la URL de Vercel).
+   Opcional: `ANTHROPIC_API_KEY` para el asistente con IA (sin ella responde en modo básico).
 3. Copiar la URL del servicio, p. ej. `https://medicitas-backend.onrender.com`.
 
 > El plan gratuito de Render "duerme" tras 15 min sin tráfico; la primera
